@@ -2,9 +2,19 @@ import paramiko
 import time
 import sys
 import boto3
+import json
 
 AWS_REGION = 'us-east-1'
 DESTINATION_PATH = '~'
+
+
+with open('collected_data.json', 'r') as openfile:
+    # Reading from json file
+    json_object = json.load(openfile)
+    openfile.close()
+
+ip_standalone = json_object["ip_standalone"]
+
 
 def mysql_setup_commands():
     """
@@ -14,25 +24,15 @@ def mysql_setup_commands():
 #!/bin/bash
 yes | sudo apt update
 yes | sudo apt-get install mysql-server
+# Sakila database
+wget https://downloads.mysql.com/docs/sakila-db.tar.gz
+tar -xf sakila-db.tar.gz
+rm sakila-db.tar.gz
+sudo mysql -e "SOURCE sakila-db/sakila-schema.sql;
+sudo mysql -e "SOURCE sakila-db/sakila-data.sql;"
+sudo mysql -e "USE sakila;"
 EOF
 """
-
-
-'''
-#!/bin/bash
-yes | sudo apt update
-yes | sudo apt install default-jdk
-wget https://downloads.apache.org/hadoop/common/hadoop-3.3.1/hadoop-3.3.1.tar.gz
-tar -xzvf hadoop-3.3.1.tar.gz
-rm hadoop-3.3.1.tar.gz
-sudo mv hadoop-3.3.1 /usr/local/hadoop
-link_to_java=$(readlink -f /usr/bin/java | sed "s:bin/java::")
-echo "export JAVA_HOME=$link_to_java" >> /usr/local/hadoop/etc/hadoop/hadoop-env.sh
-sed -i -e 's/\\r$//' config_hadoop_file.sh
-chmod +x config_hadoop_file.sh
-bash config_hadoop_file.sh
-EOF
-'''
 
 
 def ssh_connect_with_retry(ssh, ip_address, retries):
@@ -58,33 +58,6 @@ def ssh_connect_with_retry(ssh, ip_address, retries):
         time.sleep(interval)
         print('Retrying SSH connection to {}'.format(ip_address))
         ssh_connect_with_retry(ssh, ip_address, retries)
-
-
-def get_id_ips():
-    """
-    This function ...
-    """
-    ec2_client = boto3.client("ec2", region_name=AWS_REGION)
-    reservations = ec2_client.describe_instances(Filters=[
-        {
-            "Name": "instance-state-name",
-            "Values": ["running"],
-        }
-    ]).get("Reservations")
-    ids = []
-    print("Found the following instances: \n")
-    for reservation in reservations:
-        for instance in reservation["Instances"]:
-            instance_id = instance["InstanceId"]
-            instance_type = instance["InstanceType"]
-            public_ip = instance["PublicIpAddress"]
-            private_ip = instance["PrivateIpAddress"]
-            ids.append((instance_id, public_ip))
-            print(
-                f"instance id :{instance_id}, instance type: {instance_type}, public ip:{public_ip}, private ip:{private_ip}")
-    print("\n")
-    return ids
-    
     
 def install_mysql(ip):
     """
@@ -107,27 +80,10 @@ def install_mysql(ip):
     print("Mysql installed!")
 
     ssh.close()
-
-def deploy_app():
-    """
-    This function deploys the applications, scripts on the instance.
-    """
-    running = False
-    id_ip = None
-    while (not running):
-        try:
-            instances_IDs_IPs = get_id_ips()
-            id_ip = instances_IDs_IPs[0][1]
-            running = True
-        except:
-            print("Waiting for the instance to be running .. (10s)")
-            time.sleep(10)
-    print(id_ip)
-    install_mysql(id_ip)
-    
-    
+        
 print("\n############### Installing Mysql ###############\n")
 
-deploy_app()
+print(ip_standalone)
+install_mysql(ip_standalone)
 
 print("Mysql App Deployed On EC2 Instance!")

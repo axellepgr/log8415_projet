@@ -27,9 +27,9 @@ def delete_sg():
     This function delete the security group.
     """
     boto3.client('ec2').delete_security_group(
-        GroupName='LAB2',
+        GroupName='PROJECT',
     )
-    print('Security Group LAB2 deleted.')
+    print('Security Group PROJECT deleted.')
 
 
 def terminate_instance(id_list):

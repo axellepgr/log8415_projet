@@ -1,0 +1,17 @@
+{
+    "sg_id": "sg-0cec6030ddcf5d8a9",
+    "id_standalone": "i-02309ba2a4e7fae92",
+    "id_master": "i-0f23076646036fa7c",
+    "id_slaves": [
+        "i-0d295eeb03e1e2eac",
+        "i-02cd8beb2b8d02922",
+        "i-01a3745aea11b1237"
+    ],
+    "ip_standalone": "35.173.247.145",
+    "ip_master": "44.206.249.0",
+    "ip_slaves": [
+        "54.88.252.245",
+        "100.26.183.119",
+        "44.210.124.130"
+    ]
+}

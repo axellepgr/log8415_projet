@@ -1,11 +1,13 @@
 from concurrent.futures import wait
 import boto3
 import time
+import json
 
 AWS_REGION = 'us-east-1'
 INSTANCE_TYPE = "t2.micro"
 KEY_PAIR_NAME = "vockey"
 AMI_ID = "ami-08c40ec9ead489470"
+NB_INSTANCES = 5
 
 ec2_client = boto3.client("ec2", region_name=AWS_REGION)
 ec2_resource = boto3.resource('ec2', region_name=AWS_REGION)
@@ -31,7 +33,7 @@ def create_sg(vpcID):
     vpcID : is the ID of the concerned VPC.
     Returns the security group ID.
     """
-    response = ec2_client.create_security_group(GroupName="LAB2",
+    response = ec2_client.create_security_group(GroupName="PROJECT",
                                                 Description='SG_basic',
                                                 VpcId=vpcID)
     security_group_id = response['GroupId']
@@ -54,7 +56,7 @@ def create_sg(vpcID):
     return security_group_id
 
 
-def create_ec2_instances(nbr, type, sg_id, subnet_id):
+def create_ec2_instances(nbr, sg_id, subnet_id, name):
     """
     This function creates EC2 instances.
     nbr : is the desired number of instances to be created.
@@ -73,22 +75,56 @@ def create_ec2_instances(nbr, type, sg_id, subnet_id):
             "Groups": [sg_id],
             "AssociatePublicIpAddress": True,
             "SubnetId": subnet_id
-        }]
+        }],
+        TagSpecifications=[
+            {
+                'ResourceType': 'instance',
+                'Tags': [
+                    {
+                        'Key': 'Name',
+                        'Value': name
+                    },
+                ]
+            },
+        ]
     )
 
 
 def wait_until_running_and_get_ip():
     """
-    This function waits for the EC2 instance to become available.
-    returns the id and the ip the instance.
+    This function waits for the EC2 instances to become available.
+    returns the id and the ip the instances.
     """
     while (True):
-        ec2 = boto3.resource('ec2')
-        for instance in ec2.instances.all():
-            if instance.state["Name"] == "running":
-                return instance.id, instance.public_ip_address
-        time.sleep(5)
-
+        nb_running_instances = 0
+        id_list_all = []
+        id_list = {"slaves":[]}
+        ip_list = {"slaves":[]}
+        while (nb_running_instances < NB_INSTANCES):
+            for instance in ec2_resource.instances.all():
+                if instance.state["Name"] == "running":
+                    id = instance.id
+                    if id not in id_list_all:
+                        id_list_all.append(id)
+                        ip = instance.public_ip_address
+                        nb_running_instances += 1
+                        name = "no name"
+                        for tag in instance.tags:
+                            if tag['Key'] == 'Name':
+                                name = tag['Value']
+                        if name == 'standalone':
+                            id_list['standalone'] = id
+                            ip_list['standalone'] = ip
+                        elif name == 'master':
+                            id_list['master'] = id
+                            ip_list['master'] = ip
+                        else:
+                            id_list["slaves"].append(id)
+                            ip_list["slaves"].append(ip)
+                        print(str(id) + ' : ' + str(name) +
+                          ' is running.   (' + str(nb_running_instances) + '/5)')
+            time.sleep(5)
+        return id_list, ip_list
 
 # Start
 
@@ -100,16 +136,42 @@ print("IDs obtained!")
 
 print("Creating the security group...")
 sg_id = create_sg(vpcID)
-print("Security group created!\n")
+print("Security group created.")
 
-print("Creating the EC2 instance...")
-create_ec2_instances(1, INSTANCE_TYPE, sg_id, subnet_id)
-print("EC2 instance created!\n")
+print("Creating EC2 instances...")
+create_ec2_instances(1, sg_id, subnet_id, "standalone")
+print("Standalone server instance created.")
 
-print("Waiting for the EC2 instance to get in the running state...")
+create_ec2_instances(1, sg_id, subnet_id, "master")
+print("Master instance created.")
+
+for i in 1,2,3:
+    create_ec2_instances(1, sg_id, subnet_id, f"slave_{i}")
+    print("Slave number " + str(i) + " instance created.")
+
+print("\nWaiting for the EC2 instances to get in the running state...")
 id, ip = wait_until_running_and_get_ip()
-print("EC2 instance is running!")
+print("All EC2 instances are running.")
 
-time.sleep(20)
+# A dictionary to hold the resources IDs to store in a .json file for the other scripts to use
+print(id)
+print(ip)
+
+dictionary = {
+    "sg_id": sg_id,
+    "id_standalone": id["standalone"],
+    "id_master": id["master"],
+    "id_slaves": id["slaves"],
+    "ip_standalone": ip["standalone"],
+    "ip_master": ip["master"],
+    "ip_slaves": ip["slaves"],
+    }
+
+# Serializing json
+json_object = json.dumps(dictionary, indent=4)
+
+# Writing to collected_data.json
+with open("collected_data.json", "w") as outfile:
+    outfile.write(json_object)
 
 print("\n############### DONE SETTING UP THE SYSTEM ###############\n")
