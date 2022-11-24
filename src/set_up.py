@@ -51,8 +51,16 @@ def create_sg(vpcID):
             {'IpProtocol': 'tcp',
              'FromPort': 443,
              'ToPort': 443,
+             'IpRanges': [{'CidrIp': '0.0.0.0/0'}]},
+            {'IpProtocol': 'tcp',
+             'FromPort': 1186,
+             'ToPort': 1186,
+             'IpRanges': [{'CidrIp': '0.0.0.0/0'}]},
+            {'IpProtocol': 'tcp',
+             'FromPort': 3306,
+             'ToPort': 3306,
              'IpRanges': [{'CidrIp': '0.0.0.0/0'}]}
-        ])
+            ])
     return security_group_id
 
 
@@ -90,16 +98,18 @@ def create_ec2_instances(nbr, sg_id, subnet_id, name):
     )
 
 
-def wait_until_running_and_get_ip():
+def wait_until_running_and_get_info():
     """
     This function waits for the EC2 instances to become available.
-    returns the id and the ip the instances.
+    returns the id, dns and the ip of the instances.
     """
     while (True):
         nb_running_instances = 0
         id_list_all = []
         id_list = {"slaves":[]}
         ip_list = {"slaves":[]}
+        public_dns_list = {"slaves":[]}
+        private_dns_list = {"slaves":[]}
         while (nb_running_instances < NB_INSTANCES):
             for instance in ec2_resource.instances.all():
                 if instance.state["Name"] == "running":
@@ -107,6 +117,8 @@ def wait_until_running_and_get_ip():
                     if id not in id_list_all:
                         id_list_all.append(id)
                         ip = instance.public_ip_address
+                        public_dns = instance.public_dns_name
+                        private_dns = instance.private_dns_name
                         nb_running_instances += 1
                         name = "no name"
                         for tag in instance.tags:
@@ -115,30 +127,33 @@ def wait_until_running_and_get_ip():
                         if name == 'standalone':
                             id_list['standalone'] = id
                             ip_list['standalone'] = ip
+                            public_dns_list['standalone'] = public_dns
+                            private_dns_list['standalone'] = private_dns
                         elif name == 'master':
                             id_list['master'] = id
                             ip_list['master'] = ip
+                            public_dns_list['master'] = public_dns
+                            private_dns_list['master'] = private_dns
                         else:
                             id_list["slaves"].append(id)
                             ip_list["slaves"].append(ip)
+                            public_dns_list["slaves"].append(public_dns)
+                            private_dns_list["slaves"].append(private_dns)
                         print(str(id) + ' : ' + str(name) +
                           ' is running.   (' + str(nb_running_instances) + '/5)')
             time.sleep(5)
-        return id_list, ip_list
+        return id_list, ip_list, public_dns_list, private_dns_list
 
 # Start
 
 print("\n############### SETTING UP THE SYSTEM ###############\n")
 
-print("Getting the vpc and the subnet IDs...")
+print("Creating security group...")
 vpcID, subnet_id = get_vpc_id_and_subnet_id()
-print("IDs obtained!")
-
-print("Creating the security group...")
 sg_id = create_sg(vpcID)
-print("Security group created.")
+print("Done.")
 
-print("Creating EC2 instances...")
+print("\nCreating EC2 instances...")
 create_ec2_instances(1, sg_id, subnet_id, "standalone")
 print("Standalone server instance created.")
 
@@ -149,14 +164,11 @@ for i in 1,2,3:
     create_ec2_instances(1, sg_id, subnet_id, f"slave_{i}")
     print("Slave number " + str(i) + " instance created.")
 
-print("\nWaiting for the EC2 instances to get in the running state...")
-id, ip = wait_until_running_and_get_ip()
+print("\nWaiting for the EC2 instances to be running...")
+id, ip, public_dns_list, private_dns_list = wait_until_running_and_get_info()
 print("All EC2 instances are running.")
 
 # A dictionary to hold the resources IDs to store in a .json file for the other scripts to use
-print(id)
-print(ip)
-
 dictionary = {
     "sg_id": sg_id,
     "id_standalone": id["standalone"],
@@ -165,6 +177,12 @@ dictionary = {
     "ip_standalone": ip["standalone"],
     "ip_master": ip["master"],
     "ip_slaves": ip["slaves"],
+    "public_dns_standalone": public_dns_list["standalone"],
+    "public_dns_master": public_dns_list["master"],
+    "public_dns_slaves": public_dns_list["slaves"],
+    "private_dns_standalone": private_dns_list["standalone"],
+    "private_dns_master": private_dns_list["master"],
+    "private_dns_slaves": private_dns_list["slaves"],
     }
 
 # Serializing json
