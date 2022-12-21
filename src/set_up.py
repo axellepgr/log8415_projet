@@ -6,7 +6,8 @@ import json
 AWS_REGION = 'us-east-1'
 INSTANCE_TYPE = "t2.micro"
 KEY_PAIR_NAME = "vockey"
-AMI_ID = "ami-08c40ec9ead489470"
+AMI_ID = "ami-061dbd1209944525c"
+#AMI_ID = "ami-08c40ec9ead489470"
 NB_INSTANCES = 5
 
 ec2_client = boto3.client("ec2", region_name=AWS_REGION)
@@ -59,8 +60,32 @@ def create_sg(vpcID):
             {'IpProtocol': 'tcp',
              'FromPort': 3306,
              'ToPort': 3306,
+             'IpRanges': [{'CidrIp': '0.0.0.0/0'}]},
+            {'IpProtocol': 'tcp',
+             'FromPort': 30000,
+             'ToPort': 65535,
+             'IpRanges': [{'CidrIp': '0.0.0.0/0'}]},
+            {'IpProtocol': 'ICMP',
+             'FromPort': -1,
+             'ToPort': -1,
              'IpRanges': [{'CidrIp': '0.0.0.0/0'}]}
             ])
+    ec2_client.authorize_security_group_egress(
+        GroupId=security_group_id,
+        IpPermissions=[
+            {
+                'FromPort': -1,
+                'ToPort': -1,
+                'IpProtocol': 'ICMP',
+                'IpRanges': [
+                    {
+                        'CidrIp': '0.0.0.0/0',
+                        'Description': "MySQL"
+                    },
+                ]
+            }
+        ]
+    )
     return security_group_id
 
 
@@ -108,6 +133,7 @@ def wait_until_running_and_get_info():
         id_list_all = []
         id_list = {"slaves":[]}
         ip_list = {"slaves":[]}
+        private_ip_list = {"slaves":[]}
         public_dns_list = {"slaves":[]}
         private_dns_list = {"slaves":[]}
         while (nb_running_instances < NB_INSTANCES):
@@ -117,6 +143,7 @@ def wait_until_running_and_get_info():
                     if id not in id_list_all:
                         id_list_all.append(id)
                         ip = instance.public_ip_address
+                        private_ip = instance.private_ip_address
                         public_dns = instance.public_dns_name
                         private_dns = instance.private_dns_name
                         nb_running_instances += 1
@@ -127,22 +154,25 @@ def wait_until_running_and_get_info():
                         if name == 'standalone':
                             id_list['standalone'] = id
                             ip_list['standalone'] = ip
+                            private_ip_list['standalone'] = private_ip
                             public_dns_list['standalone'] = public_dns
                             private_dns_list['standalone'] = private_dns
                         elif name == 'master':
                             id_list['master'] = id
                             ip_list['master'] = ip
+                            private_ip_list['master'] = private_ip
                             public_dns_list['master'] = public_dns
                             private_dns_list['master'] = private_dns
                         else:
                             id_list["slaves"].append(id)
                             ip_list["slaves"].append(ip)
+                            private_ip_list["slaves"].append(private_ip)
                             public_dns_list["slaves"].append(public_dns)
                             private_dns_list["slaves"].append(private_dns)
                         print(str(id) + ' : ' + str(name) +
                           ' is running.   (' + str(nb_running_instances) + '/5)')
             time.sleep(5)
-        return id_list, ip_list, public_dns_list, private_dns_list
+        return id_list, ip_list, public_dns_list, private_dns_list, private_ip_list
 
 # Start
 
@@ -165,7 +195,7 @@ for i in 1,2,3:
     print("Slave number " + str(i) + " instance created.")
 
 print("\nWaiting for the EC2 instances to be running...")
-id, ip, public_dns_list, private_dns_list = wait_until_running_and_get_info()
+id, ip, public_dns_list, private_dns_list, private_ip_list = wait_until_running_and_get_info()
 print("All EC2 instances are running.")
 
 # A dictionary to hold the resources IDs to store in a .json file for the other scripts to use
@@ -177,6 +207,9 @@ dictionary = {
     "ip_standalone": ip["standalone"],
     "ip_master": ip["master"],
     "ip_slaves": ip["slaves"],
+    "private_ip_standalone": private_ip_list["standalone"],
+    "private_ip_master": private_ip_list["master"],
+    "private_ip_slaves": private_ip_list["slaves"],
     "public_dns_standalone": public_dns_list["standalone"],
     "public_dns_master": public_dns_list["master"],
     "public_dns_slaves": public_dns_list["slaves"],
