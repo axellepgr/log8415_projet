@@ -1,0 +1,78 @@
+WARNING: --num-threads is deprecated, use --threads instead
+WARNING: --max-time is deprecated, use --time instead
+sysbench 1.0.11 (using system LuaJIT 2.1.0-beta3)
+
+Running the test with following options:
+Number of threads: 3
+Initializing random number generator from current time
+
+
+Initializing worker threads...
+
+Threads started!
+
+SQL statistics:
+    queries performed:
+        read:                            237300
+        write:                           67800
+        other:                           33900
+        total:                           339000
+    transactions:                        16950  (282.38 per sec.)
+    queries:                             339000 (5647.70 per sec.)
+    ignored errors:                      0      (0.00 per sec.)
+    reconnects:                          0      (0.00 per sec.)
+
+General statistics:
+    total time:                          60.0223s
+    total number of events:              16950
+
+Latency (ms):
+         min:                                  2.78
+         avg:                                 10.62
+         max:                                479.91
+         95th percentile:                     17.63
+         sum:                             179977.34
+
+Threads fairness:
+    events (avg/stddev):           5650.0000/11.43
+    execution time (avg/stddev):   59.9924/0.01
+
+WARNING: --num-threads is deprecated, use --threads instead
+WARNING: --max-time is deprecated, use --time instead
+sysbench 1.0.11 (using system LuaJIT 2.1.0-beta3)
+
+Running the test with following options:
+Number of threads: 3
+Initializing random number generator from current time
+
+
+Initializing worker threads...
+
+Threads started!
+
+SQL statistics:
+    queries performed:
+        read:                            249214
+        write:                           71204
+        other:                           35602
+        total:                           356020
+    transactions:                        17801  (296.64 per sec.)
+    queries:                             356020 (5932.90 per sec.)
+    ignored errors:                      0      (0.00 per sec.)
+    reconnects:                          0      (0.00 per sec.)
+
+General statistics:
+    total time:                          60.0058s
+    total number of events:              17801
+
+Latency (ms):
+         min:                                  4.03
+         avg:                                 10.11
+         max:                                309.89
+         95th percentile:                     16.41
+         sum:                             179951.37
+
+Threads fairness:
+    events (avg/stddev):           5933.6667/7.76
+    execution time (avg/stddev):   59.9838/0.00
+

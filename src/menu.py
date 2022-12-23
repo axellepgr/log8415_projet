@@ -68,7 +68,7 @@ def shutdown_system(instances_ids):
     print('System shutdown.')
 
 
-id_list = [id]
+id_list = []
 while True:
     print('\nMenu :')
     print('    press \'i\' to get informations. ')
@@ -81,6 +81,7 @@ while True:
     elif (line == 'q'):
         sys.exit()
     elif (line == 's'):
+        id_list = get_running_instances()
         shutdown_system(id_list)
     elif (line == ''):
         continue

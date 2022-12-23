@@ -1,38 +1,41 @@
 {
-    "sg_id": "sg-0fd016082da38fa25",
-    "id_standalone": "i-0eace7ae5dde58c4e",
-    "id_master": "i-0a6a94aa5e0484ad9",
+    "sg_id": "sg-0c6bb9571375b822d",
+    "id_standalone": "i-03483c1d9aa55d065",
+    "id_master": "i-00999b429f14acd45",
     "id_slaves": [
-        "i-04f5021a6d6a0df32",
-        "i-04ece5dd247d4ba1a",
-        "i-0e6edcd1f34bd4f92"
+        "i-0cbca31ddc709acba",
+        "i-03e0481b4ea77e2b7",
+        "i-050ce59a5d7a8422c"
     ],
-    "ip_standalone": "3.84.0.178",
-    "ip_master": "52.207.58.247",
+    "id_proxy": "i-070c59c5c8f326d9e",
+    "ip_standalone": "54.144.114.47",
+    "ip_master": "52.90.91.214",
     "ip_slaves": [
-        "3.84.77.241",
-        "3.95.189.52",
-        "54.175.200.149"
+        "3.83.137.22",
+        "44.204.167.220",
+        "3.83.191.150"
     ],
-    "private_ip_standalone": "172.31.83.154",
-    "private_ip_master": "172.31.86.113",
+    "ip_proxy": "54.236.229.114",
+    "private_ip_standalone": "172.31.86.33",
+    "private_ip_master": "172.31.91.18",
     "private_ip_slaves": [
-        "172.31.93.182",
-        "172.31.92.117",
-        "172.31.83.55"
+        "172.31.89.195",
+        "172.31.83.250",
+        "172.31.92.93"
     ],
-    "public_dns_standalone": "ec2-3-84-0-178.compute-1.amazonaws.com",
-    "public_dns_master": "ec2-52-207-58-247.compute-1.amazonaws.com",
+    "private_ip_proxy": "172.31.92.99",
+    "public_dns_standalone": "ec2-54-144-114-47.compute-1.amazonaws.com",
+    "public_dns_master": "ec2-52-90-91-214.compute-1.amazonaws.com",
     "public_dns_slaves": [
-        "ec2-3-84-77-241.compute-1.amazonaws.com",
-        "ec2-3-95-189-52.compute-1.amazonaws.com",
-        "ec2-54-175-200-149.compute-1.amazonaws.com"
+        "ec2-3-83-137-22.compute-1.amazonaws.com",
+        "ec2-44-204-167-220.compute-1.amazonaws.com",
+        "ec2-3-83-191-150.compute-1.amazonaws.com"
     ],
-    "private_dns_standalone": "ip-172-31-83-154.ec2.internal",
-    "private_dns_master": "ip-172-31-86-113.ec2.internal",
+    "private_dns_standalone": "ip-172-31-86-33.ec2.internal",
+    "private_dns_master": "ip-172-31-91-18.ec2.internal",
     "private_dns_slaves": [
-        "ip-172-31-93-182.ec2.internal",
-        "ip-172-31-92-117.ec2.internal",
-        "ip-172-31-83-55.ec2.internal"
+        "ip-172-31-89-195.ec2.internal",
+        "ip-172-31-83-250.ec2.internal",
+        "ip-172-31-92-93.ec2.internal"
     ]
 }

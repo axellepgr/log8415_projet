@@ -4,9 +4,6 @@ import sys
 import boto3
 import json
 
-AWS_REGION = 'us-east-1'
-DESTINATION_PATH = '~'
-
 # Retrieving the data from the .json file
 with open('collected_data.json', 'r') as openfile:
     json_object = json.load(openfile)
@@ -273,10 +270,6 @@ def install_mysql(ip, instance, private_dns, private_dns_master, private_ips_sla
         # Initializing Mysql on the master
         print("Starting Mysql on the master...")
         stdin, stdout, stderr = ssh.exec_command(mysql_start_commands_master())
-        old_stdout = sys.stdout
-        log_file = open("logfile.log", "w")
-        print('env setup done \n stdout:', stdout.read(), file=log_file)
-        log_file.close()
         print("Done.")
     elif (instance=='master3'):               
         # Setting up users

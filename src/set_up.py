@@ -7,12 +7,10 @@ AWS_REGION = 'us-east-1'
 INSTANCE_TYPE = "t2.micro"
 KEY_PAIR_NAME = "vockey"
 AMI_ID = "ami-061dbd1209944525c"
-#AMI_ID = "ami-08c40ec9ead489470"
-NB_INSTANCES = 5
+NB_INSTANCES = 6
 
 ec2_client = boto3.client("ec2", region_name=AWS_REGION)
 ec2_resource = boto3.resource('ec2', region_name=AWS_REGION)
-
 
 def get_vpc_id_and_subnet_id():
     """
@@ -163,6 +161,12 @@ def wait_until_running_and_get_info():
                             private_ip_list['master'] = private_ip
                             public_dns_list['master'] = public_dns
                             private_dns_list['master'] = private_dns
+                        elif name == 'proxy':
+                            id_list['proxy'] = id
+                            ip_list['proxy'] = ip
+                            private_ip_list['proxy'] = private_ip
+                            public_dns_list['proxy'] = public_dns
+                            private_dns_list['proxy'] = private_dns
                         else:
                             id_list["slaves"].append(id)
                             ip_list["slaves"].append(ip)
@@ -193,6 +197,9 @@ print("Master instance created.")
 for i in 1,2,3:
     create_ec2_instances(1, sg_id, subnet_id, f"slave_{i}")
     print("Slave number " + str(i) + " instance created.")
+    
+create_ec2_instances(1, sg_id, subnet_id, "proxy")
+print("Proxy instance created.")
 
 print("\nWaiting for the EC2 instances to be running...")
 id, ip, public_dns_list, private_dns_list, private_ip_list = wait_until_running_and_get_info()
@@ -204,12 +211,15 @@ dictionary = {
     "id_standalone": id["standalone"],
     "id_master": id["master"],
     "id_slaves": id["slaves"],
+    "id_proxy": id["proxy"],
     "ip_standalone": ip["standalone"],
     "ip_master": ip["master"],
     "ip_slaves": ip["slaves"],
+    "ip_proxy": ip["proxy"],
     "private_ip_standalone": private_ip_list["standalone"],
     "private_ip_master": private_ip_list["master"],
     "private_ip_slaves": private_ip_list["slaves"],
+    "private_ip_proxy": private_ip_list["proxy"],
     "public_dns_standalone": public_dns_list["standalone"],
     "public_dns_master": public_dns_list["master"],
     "public_dns_slaves": public_dns_list["slaves"],

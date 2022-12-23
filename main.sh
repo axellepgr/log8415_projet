@@ -10,7 +10,8 @@ then
     pip3 install matplotlib==3.0.3
     pip3 install scpclient==0.14.4
     pip3 install statistics
-
+    pip3 install pythonping==1.1.4
+    pip3 install sshtunnel==0.4.0
     echo "Clonning the git repo to proceed with the deployment"
     git clone https://github.com/axellepgr/log8415_projet.git
     echo "Some set up"
@@ -29,7 +30,8 @@ else
     pip install requests==2.22.0
     pip install scpclient==0.14.4
     pip install statistics
-
+    pip install pythonping==1.1.4
+    pip install sshtunnel==0.4.0
     echo "Clonning the git repo to proceed with the deployment"
     git clone https://github.com/axellepgr/log8415_projet.git
     echo "Some set up"
