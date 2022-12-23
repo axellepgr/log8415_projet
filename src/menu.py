@@ -1,5 +1,6 @@
 import boto3
 import sys
+import json
 
 def get_running_instances():
     """
@@ -67,6 +68,12 @@ def shutdown_system(instances_ids):
     delete_sg()
     print('System shutdown.')
 
+# Retrieving the data from the .json file
+with open('collected_data.json', 'r') as openfile:
+    json_object = json.load(openfile)
+    openfile.close()
+    
+ip_proxy = json_object["ip_proxy"]
 
 id_list = []
 while True:
@@ -78,6 +85,8 @@ while True:
     if (line == 'i'):
         print('\nRunning instances :')
         id_list = get_running_instances()
+        print('\nPlease connect to ' + str(ip_proxy) + ' with ssh for the proxy.')
+        print('Once logged in, please run : python3 proxy.py')
     elif (line == 'q'):
         sys.exit()
     elif (line == 's'):

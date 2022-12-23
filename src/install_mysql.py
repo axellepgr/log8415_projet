@@ -87,6 +87,7 @@ sudo chmod -R 777 /opt/mysqlcluster/deploy/ndb_data
 
 echo "[mysqld]
 ndbcluster
+bind-address=0.0.0.0            # bind to all available addresses
 datadir=/opt/mysqlcluster/deploy/mysqld_data
 basedir=/opt/mysqlcluster/home/mysqlc
 port=3306" >> /opt/mysqlcluster/deploy/conf/my.cnf
@@ -169,8 +170,8 @@ tar -xf sakila-db.tar.gz
 rm sakila-db.tar.gz
 
 sudo /opt/mysqlcluster/home/mysqlc/bin/mysql -e "
-CREATE USER 'myapp'@'localhost' IDENTIFIED BY 'testpwd';
-GRANT ALL PRIVILEGES ON * . * TO 'myapp'@'localhost' IDENTIFIED BY 'root';"
+CREATE USER 'myapp'@'%' IDENTIFIED BY 'testpwd';
+GRANT ALL PRIVILEGES ON * . * TO 'myapp'@'%' IDENTIFIED BY 'password' WITH GRANT OPTION;"
 sudo /opt/mysqlcluster/home/mysqlc/bin/mysql -e "
 USE mysql; 
 UPDATE user SET plugin='mysql_native_password' WHERE User='root';
