@@ -25,7 +25,7 @@ def mysql_setup_commands_server():
     """
     return """
 #!/bin/bash
-yes | sudo apt update
+sudo apt-get update
 yes | sudo apt-get install mysql-server
 # Sakila 
 wget https://downloads.mysql.com/docs/sakila-db.tar.gz
@@ -34,8 +34,7 @@ rm sakila-db.tar.gz
 sudo mysql -e "
 SOURCE sakila-db/sakila-schema.sql;
 SOURCE sakila-db/sakila-data.sql;
-USE sakila;
-"
+USE sakila;"
 # Sysbench
 yes | sudo apt-get install sysbench
 EOF
@@ -288,6 +287,7 @@ def install_mysql(ip, instance, private_dns, private_dns_master, private_ips_sla
 print("\n############### Installing Mysql ###############\n")
 
 install_mysql(ip_standalone, 'server', None, None, None, None)
+print("Mysql App Deployed On the satd-alone server!")
 install_mysql(ip_master, 'master1', private_dns_slaves, private_dns_master, private_ip_slaves, None)
 for i in range(len(ip_slaves)):
     ip = ip_slaves[i]
