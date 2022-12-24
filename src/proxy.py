@@ -54,7 +54,7 @@ def is_write_request(request):
     instructions = request.split(";")
     for instruction in instructions:
         keyword = instruction.strip().lower().split()
-        if keyword[0] in ["alter","rename","create","drop","delete","update","insert","grant","revoke","merge"]:
+        if len(keyword)>0 and keyword[0] in ["alter","rename","create","drop","delete","update","insert","grant","revoke","merge"]:
             is_write = True
     return is_write
 
@@ -90,7 +90,7 @@ def customized(ips, ip_master, query):
 
 def get_query():
     '''
-    Gets the query.
+    Gets and returns the query.
     '''
     print("Please type \'example\' for an example query.")
     return input('QUERY> ')

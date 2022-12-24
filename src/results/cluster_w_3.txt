@@ -14,65 +14,26 @@ Threads started!
 SQL statistics:
     queries performed:
         read:                            0
-        write:                           137728
-        other:                           68864
-        total:                           206592
-    transactions:                        34432  (573.75 per sec.)
-    queries:                             206592 (3442.50 per sec.)
+        write:                           142744
+        other:                           71372
+        total:                           214116
+    transactions:                        35686  (594.69 per sec.)
+    queries:                             214116 (3568.16 per sec.)
     ignored errors:                      0      (0.00 per sec.)
     reconnects:                          0      (0.00 per sec.)
 
 General statistics:
-    total time:                          60.0101s
-    total number of events:              34432
+    total time:                          60.0054s
+    total number of events:              35686
 
 Latency (ms):
-         min:                                  0.96
-         avg:                                  5.23
-         max:                                379.38
-         95th percentile:                     10.46
-         sum:                             179919.48
+         min:                                  0.87
+         avg:                                  5.04
+         max:                                307.80
+         95th percentile:                     10.27
+         sum:                             179896.83
 
 Threads fairness:
-    events (avg/stddev):           11477.3333/7.41
-    execution time (avg/stddev):   59.9732/0.00
-
-WARNING: --num-threads is deprecated, use --threads instead
-WARNING: --max-time is deprecated, use --time instead
-sysbench 1.0.11 (using system LuaJIT 2.1.0-beta3)
-
-Running the test with following options:
-Number of threads: 3
-Initializing random number generator from current time
-
-
-Initializing worker threads...
-
-Threads started!
-
-SQL statistics:
-    queries performed:
-        read:                            0
-        write:                           124332
-        other:                           62166
-        total:                           186498
-    transactions:                        31083  (517.96 per sec.)
-    queries:                             186498 (3107.76 per sec.)
-    ignored errors:                      0      (0.00 per sec.)
-    reconnects:                          0      (0.00 per sec.)
-
-General statistics:
-    total time:                          60.0086s
-    total number of events:              31083
-
-Latency (ms):
-         min:                                  0.98
-         avg:                                  5.79
-         max:                                241.44
-         95th percentile:                     11.87
-         sum:                             179917.41
-
-Threads fairness:
-    events (avg/stddev):           10361.0000/61.16
-    execution time (avg/stddev):   59.9725/0.00
+    events (avg/stddev):           11895.3333/61.89
+    execution time (avg/stddev):   59.9656/0.00
 
